@@ -12,9 +12,6 @@ sns.set_theme(style="whitegrid")
 plt.rcParams['figure.figsize'] = (10, 8)
 
 DATA_FILE = "CRIME_REVIEW_FOR_MONTHS_FROM_JAN_TO_SEP.csv"
-if not os.path.exists(DATA_FILE):
-    raise FileNotFoundError(f"{DATA_FILE} not found.")
-
 df = pd.read_csv(DATA_FILE)
 df.columns = df.columns.str.strip().str.upper()
 
@@ -30,16 +27,15 @@ def create_crime_type(row):
 
 df['CRIME_TYPE'] = df.apply(create_crime_type, axis=1)
 
-if 'SEVERITY' not in df.columns:
-    def get_severity(crime_name):
-        crime_name = str(crime_name).upper()
-        if any(x in crime_name for x in ['MURDER', 'RAPE', 'ROBBERY', 'DACOITY', 'KIDNAPPING', 'ARSON', 'DOWRY DEATH', 'ACID', 'TRAFFICKING', 'POCSO']):
-            return 'High'
-        elif any(x in crime_name for x in ['THEFT', 'BURGLARY', 'ASSAULT', 'SNATCHING', 'RIOT', 'HURT', 'CHEATING', 'FORGERY', 'CYBER']):
-            return 'Medium'
-        else:
-            return 'Low'
-    df['SEVERITY'] = df['CRIME_TYPE'].apply(get_severity)
+def get_severity(crime_name):
+    crime_name = str(crime_name).upper()
+    if any(x in crime_name for x in ['MURDER', 'RAPE', 'ROBBERY', 'DACOITY', 'KIDNAPPING', 'ARSON', 'DOWRY DEATH', 'ACID', 'TRAFFICKING', 'POCSO']):
+        return 'High'
+    elif any(x in crime_name for x in ['THEFT', 'BURGLARY', 'ASSAULT', 'SNATCHING', 'RIOT', 'HURT', 'CHEATING', 'FORGERY', 'CYBER']):
+        return 'Medium'
+    else:
+        return 'Low'
+df['SEVERITY'] = df['CRIME_TYPE'].apply(get_severity)
 
 X_text = df['CRIME_TYPE']
 y = df['SEVERITY']

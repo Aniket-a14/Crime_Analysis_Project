@@ -14,9 +14,6 @@ sns.set_theme(style="whitegrid")
 plt.rcParams['figure.figsize'] = (10, 8)
 
 DATA_FILE = "CRIME_REVIEW_FOR_MONTHS_FROM_JAN_TO_SEP.csv"
-if not os.path.exists(DATA_FILE):
-    raise FileNotFoundError(f"{DATA_FILE} not found.")
-
 df = pd.read_csv(DATA_FILE)
 df.columns = df.columns.str.strip().str.upper()
 

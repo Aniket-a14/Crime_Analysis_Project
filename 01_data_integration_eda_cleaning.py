@@ -29,25 +29,16 @@ dfs = []
 print("Loading datasets...")
 for month_name, filename in FILES.items():
     file_path = os.path.join(DATA_DIR, filename)
-    if not os.path.exists(file_path):
-        print(f"Warning: File not found: {file_path}")
-        continue
     
-    try:
-        df = pd.read_csv(file_path)
-        df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-        df.dropna(axis=1, how='all', inplace=True)
-        df.columns = df.columns.str.strip().str.upper()
-        df['MONTH_NAME'] = month_name
-        df['MONTH_INDEX'] = MONTH_MAP[month_name]
-        df['YEAR'] = 2025
-        dfs.append(df)
-        print(f"Loaded {month_name}: {df.shape}")
-    except Exception as e:
-        print(f"Error loading {filename}: {e}")
-
-if not dfs:
-    raise ValueError("No datasets loaded!")
+    df = pd.read_csv(file_path)
+    df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+    df.dropna(axis=1, how='all', inplace=True)
+    df.columns = df.columns.str.strip().str.upper()
+    df['MONTH_NAME'] = month_name
+    df['MONTH_INDEX'] = MONTH_MAP[month_name]
+    df['YEAR'] = 2025
+    dfs.append(df)
+    print(f"Loaded {month_name}: {df.shape}")
 
 df_all = pd.concat(dfs, ignore_index=True)
 
@@ -65,18 +56,15 @@ print(df_all.describe(include='all'))
 print("\n--- 2.3 Crime Distribution ---")
 crime_col = 'HEADS CRIME'
 
-if crime_col:
-    print(f"Using '{crime_col}' as crime type column.")
-    plt.figure(figsize=(14, 8))
-    top_crimes = df_all[crime_col].value_counts().head(15)
-    sns.barplot(y=top_crimes.index, x=top_crimes.values, palette="viridis")
-    plt.title("Top 15 Crime Types (Jan-Sep 2025)")
-    plt.xlabel("Count")
-    plt.ylabel("Crime Type")
-    plt.tight_layout()
-    plt.show()
-else:
-    print("Could not identify Crime Type column automatically.")
+print(f"Using '{crime_col}' as crime type column.")
+plt.figure(figsize=(14, 8))
+top_crimes = df_all[crime_col].value_counts().head(15)
+sns.barplot(y=top_crimes.index, x=top_crimes.values, palette="viridis")
+plt.title("Top 15 Crime Types (Jan-Sep 2025)")
+plt.xlabel("Count")
+plt.ylabel("Crime Type")
+plt.tight_layout()
+plt.show()
 
 print("\n--- 2.4 Time-based Crime Trends ---")
 monthly_counts = df_all.groupby('MONTH_INDEX').size()
@@ -100,17 +88,16 @@ for col in df_clean.columns:
 
 df_clean.drop_duplicates(inplace=True)
 
-if 'SEVERITY' not in df_clean.columns and crime_col:
-    def get_severity(crime_name):
-        crime_name = str(crime_name).upper()
-        if any(x in crime_name for x in ['MURDER', 'RAPE', 'ROBBERY', 'DOWRY DEATH']):
-            return 'High'
-        elif any(x in crime_name for x in ['THEFT', 'BURGLARY', 'ASSAULT', 'SNATCHING']):
-            return 'Medium'
-        else:
-            return 'Low'
-    
-    df_clean['SEVERITY'] = df_clean[crime_col].apply(get_severity)
+def get_severity(crime_name):
+    crime_name = str(crime_name).upper()
+    if any(x in crime_name for x in ['MURDER', 'RAPE', 'ROBBERY', 'DOWRY DEATH']):
+        return 'High'
+    elif any(x in crime_name for x in ['THEFT', 'BURGLARY', 'ASSAULT', 'SNATCHING']):
+        return 'Medium'
+    else:
+        return 'Low'
+
+df_clean['SEVERITY'] = df_clean[crime_col].apply(get_severity)
 
 print("\nFinal Cleaned Dataset Info:")
 print(df_clean.info())
