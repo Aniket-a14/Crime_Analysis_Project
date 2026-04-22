@@ -525,15 +525,15 @@ export default function Dashboard({ initialData }: PythonDataProps) {
 
       {/* INTELLIGENCE MARQUEE - TICKER */}
       <div className="fixed bottom-0 left-0 right-0 h-10 bg-black/80 backdrop-blur-xl border-t border-indigo-500/30 z-50 flex items-center overflow-hidden">
-        <div className="bg-indigo-500 h-full px-4 flex items-center justify-center shrink-0 z-10 shadow-[4px_0_15px_rgba(99,102,241,0.5)]">
-           <span className="text-[10px] font-mono font-black text-black tracking-widest uppercase">Live_Threats</span>
+        <div className="bg-rose-500 h-full px-4 flex items-center justify-center shrink-0 z-10 shadow-[4px_0_15px_rgba(244,63,94,0.5)]">
+           <span className="text-[10px] font-mono font-black text-black tracking-widest uppercase">Risk_Alerts</span>
         </div>
         <div className="flex whitespace-nowrap animate-marquee">
           {[...initialData.ledger.filter((i: any) => i.Risk_Level === 'High').slice(0, 10), ...initialData.ledger.filter((i: any) => i.Risk_Level === 'High').slice(0, 10)].map((alert: any, i: number) => (
             <div key={i} className="flex items-center gap-4 px-8 border-r border-white/5">
-               <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
+               <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></div>
                <span className="text-[10px] font-mono font-bold text-rose-500 uppercase tracking-wider">{alert.KEY}</span>
-               <span className="text-[9px] font-mono text-slate-500">RISK: {(alert.Risk_Score * 100).toFixed(1)}%</span>
+               <span className="text-[9px] font-mono text-slate-500 tracking-tighter">COMPUTED_RISK: {(alert.Risk_Score * 100).toFixed(1)}%</span>
                <span className="text-[9px] font-mono text-indigo-400">TREND: +{alert.Slope?.toFixed(2)}</span>
             </div>
           ))}
