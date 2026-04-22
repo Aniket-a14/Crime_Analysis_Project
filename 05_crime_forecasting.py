@@ -97,4 +97,18 @@ plt.xlabel("Month Index")
 plt.ylabel("Crime Count")
 plt.legend()
 plt.grid(True)
-plt.show()
+try:
+    import json
+    import os
+    os.makedirs('dashboard/public/outputs', exist_ok=True)
+    plt.savefig('dashboard/public/outputs/plot_05.png')
+    with open('dashboard/public/outputs/data_05.json', 'w') as f:
+        json.dump({
+            'mae': float(mean_absolute_error(y, y_pred)),
+            'rmse': float(np.sqrt(mean_squared_error(y, y_pred))),
+            'r2': float(r2_score(y, y_pred)),
+            'forecasts': forecast_df.head(10).to_dict(orient='records'),
+            'total_predicted_load': float(forecast_df['Predicted_Count'].sum())
+        }, f)
+except Exception as e:
+    print("Error saving 05:", e)

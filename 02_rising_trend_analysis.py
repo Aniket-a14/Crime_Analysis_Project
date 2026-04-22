@@ -85,7 +85,14 @@ plt.xlabel("Month")
 plt.ylabel("Crime Count")
 plt.legend()
 plt.grid(True)
-plt.show()
+try:
+    import json
+    os.makedirs('dashboard/public/outputs', exist_ok=True)
+    plt.savefig('dashboard/public/outputs/plot_02.png')
+    with open('dashboard/public/outputs/data_02.json', 'w') as f:
+        json.dump({'trends': rising_trends.to_dict(orient="records")}, f)
+except Exception as e:
+    print("Error saving:", e)
 
 print("\n--- 🚨 TREND ALERTS 🚨 ---")
 for index, row in rising_trends.head(5).iterrows():

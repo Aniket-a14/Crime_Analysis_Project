@@ -64,7 +64,13 @@ sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['High', 'Medium'
 plt.title("Confusion Matrix - Severity Classification")
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
-plt.show()
+try:
+    import json
+    import os
+    os.makedirs('dashboard/public/outputs', exist_ok=True)
+    plt.savefig('dashboard/public/outputs/plot_03.png')
+except Exception as e:
+    pass
 
 feature_names = tfidf.get_feature_names_out()
 importances = clf.feature_importances_
@@ -89,3 +95,16 @@ sample_preds = clf.predict(sample_vec)
 for crime, severity in zip(sample_crimes, sample_preds):
     priority = "URGENT ACTION" if severity == 'High' else ("IMMEDIATE REVIEW" if severity == 'Medium' else "ROUTINE CHECK")
     print(f"Crime: {crime:<30} | Severity: {severity:<10} | Priority: {priority}")
+
+try:
+    metrics = {
+        'accuracy': float(accuracy_score(y_test, y_pred)),
+        'precision': float(precision_score(y_test, y_pred, average='macro')),
+        'recall': float(recall_score(y_test, y_pred, average='macro')),
+        'f1': float(f1_score(y_test, y_pred, average='macro')),
+        'top_features': [{'feature': str(feature_names[indices[i]]), 'importance': float(importances[indices[i]])} for i in range(10) if i < len(indices)]
+    }
+    with open('dashboard/public/outputs/data_03.json', 'w') as f:
+        json.dump(metrics, f)
+except Exception as e:
+    print("Error saving 03 JSON:", e)

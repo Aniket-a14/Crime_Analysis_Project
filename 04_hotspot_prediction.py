@@ -85,7 +85,13 @@ plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('ROC Curve - High-Crime Prediction')
 plt.legend(loc="lower right")
-plt.show()
+try:
+    import json
+    import os
+    os.makedirs('dashboard/public/outputs', exist_ok=True)
+    plt.savefig('dashboard/public/outputs/plot_04.png')
+except Exception:
+    pass
 
 lr_model = models["Logistic Regression"]
 feature_names = list(tfidf.get_feature_names_out()) + ['MONTH_INDEX']
@@ -109,3 +115,14 @@ high_risk_crimes = next_month_data.sort_values(by='Probability', ascending=False
 
 print(f"\n--- Predicted High-Crime Hotspots (Crime Types) for Month {next_month} ---")
 print(high_risk_crimes[['CRIME_TYPE', 'Probability']].head(10))
+
+try:
+    with open('dashboard/public/outputs/data_04.json', 'w') as f:
+        json.dump({
+            'accuracy_lr': float(results["Logistic Regression"]['Accuracy']),
+            'accuracy_nb': float(results["Naive Bayes"]['Accuracy']),
+            'hotspots': high_risk_crimes[['CRIME_TYPE', 'Probability']].head(10).to_dict(orient='records'),
+            'top_factors': [{'feature': str(feature_names[i]), 'coef': float(coefs[i])} for i in top_indices]
+        }, f)
+except Exception as e:
+    print("Error saving 04 JSON:", e)

@@ -121,4 +121,12 @@ sns.scatterplot(data=frequency, x='Total_Count', y='Risk_Score', hue='Risk_Level
 plt.title("Public Safety Risk Analysis: Frequency vs Risk Score")
 plt.xlabel("Total Crime Count")
 plt.ylabel("Calculated Risk Score")
-plt.show()
+try:
+    import json
+    import os
+    os.makedirs('dashboard/public/outputs', exist_ok=True)
+    plt.savefig('dashboard/public/outputs/plot_06.png')
+    with open('dashboard/public/outputs/data_06.json', 'w') as f:
+        json.dump({"risk_distribution": frequency['Risk_Level'].value_counts().to_dict()}, f)
+except Exception as e:
+    print("Error saving 06:", e)
