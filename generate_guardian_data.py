@@ -25,6 +25,7 @@ try:
         'total_crimes_detected': int(df[count_col].sum()),
         'unique_categories': int(df['MAJOR HEADS'].nunique()),
         'avg_monthly_load': float(df.groupby('MONTH_INDEX')[count_col].sum().mean()),
+        'monthly_totals': df.groupby('MONTH_INDEX')[count_col].sum().to_dict(),
         'severity_breakdown': df['SEVERITY'].value_counts().to_dict() if 'SEVERITY' in df.columns else {},
         'monthly_volatility': df.groupby('MONTH_INDEX')[count_col].sum().pct_change().fillna(0).tolist()
     }
