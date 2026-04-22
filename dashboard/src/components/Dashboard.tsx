@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell,
-  AreaChart, Area
+  AreaChart, Area, PieChart, Pie
 } from 'recharts';
 import { 
   TrendingUp, ShieldAlert, Crosshair, BarChart3, AlertTriangle, Zap, Activity, ChevronRight, Hash,
-  Database, Cpu, Globe, Info, Terminal, Search
+  Database, Cpu, Globe, Info, Terminal, Search, LayoutDashboard, Shield, ListFilter,
+  Eye, Filter
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -17,20 +18,184 @@ interface PythonDataProps {
 }
 
 export default function Dashboard({ initialData }: PythonDataProps) {
-  const [activeTab, setActiveTab] = useState<number>(2);
+  const [activeTab, setActiveTab] = useState<number>(1);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const tabs = [
+    { id: 1, num: "01", name: "Executive Intel", icon: LayoutDashboard, desc: "Global Situational Awareness" },
     { id: 2, num: "02", name: "Trend Analysis", icon: TrendingUp, desc: "Linear Regression Engine" },
     { id: 3, num: "03", name: "Severity Engine", icon: ShieldAlert, desc: "Decision Tree Logic" },
     { id: 4, num: "04", name: "Hotspot Predictor", icon: Crosshair, desc: "Logit Classification" },
     { id: 5, num: "05", name: "Crime Forecaster", icon: BarChart3, desc: "Polynomial OLS" },
-    { id: 6, num: "06", name: "Risk Matrix", icon: AlertTriangle, desc: "Global Risk Scoring" }
+    { id: 6, num: "06", name: "Risk Matrix", icon: AlertTriangle, desc: "Global Risk Scoring" },
+    { id: 7, num: "07", name: "Intelligence Ledger", icon: ListFilter, desc: "Master Search Database" }
   ];
+
+  const filteredLedger = useMemo(() => {
+    if (!initialData.ledger) return [];
+    return initialData.ledger.filter((item: any) => 
+      item.KEY?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [initialData.ledger, searchQuery]);
 
   const renderTabContent = () => {
     const commonSizes = "(max-width: 1024px) 100vw, (max-width: 1600px) calc(100vw - 320px), 1280px";
     
     switch(activeTab) {
+      case 1:
+        return (
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { label: "TOTAL_VECTORS", value: initialData.global?.total_records, icon: Hash, color: "text-indigo-400" },
+                { label: "SUM_CRIME_LOAD", value: initialData.global?.total_crimes_detected?.toLocaleString(), icon: Zap, color: "text-emerald-400" },
+                { label: "AVG_MONTHLY", value: initialData.global?.avg_monthly_load?.toFixed(1), icon: Activity, color: "text-rose-400" },
+                { label: "UNIQUE_TYPES", value: initialData.global?.unique_categories, icon: Globe, color: "text-violet-400" },
+              ].map((kpi, i) => (
+                <div key={i} className="stealth-card p-6 flex flex-col items-center text-center">
+                  <kpi.icon className={cn("w-5 h-5 mb-4", kpi.color)} />
+                  <span className="data-label mb-2">{kpi.label}</span>
+                  <span className="text-3xl font-black text-white tracking-tighter">{kpi.value}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <div className="lg:col-span-8 stealth-card p-8">
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="font-sans font-bold text-slate-100 flex items-center gap-2">
+                    <Database className="w-4 h-4 text-indigo-400" />
+                    SYSTEM_MONTHLY_FLUX
+                  </h3>
+                  <div className="flex gap-2">
+                    <div className="px-3 py-1 bg-white/5 rounded text-[9px] font-mono font-bold text-slate-500 tracking-widest uppercase">9_MONTH_SPAN</div>
+                  </div>
+                </div>
+                <ResponsiveContainer width="100%" height={320}>
+                  <AreaChart data={Object.entries(initialData.global?.monthly_totals || {}).map(([month, val]) => ({ month, val }))}>
+                    <defs>
+                      <linearGradient id="colorVal" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                    <XAxis dataKey="month" stroke="#475569" tick={{fontSize: 10, fontFamily: 'var(--font-jetbrains-mono)'}} axisLine={false} tickLine={false} />
+                    <YAxis stroke="#475569" tick={{fontSize: 10, fontFamily: 'var(--font-jetbrains-mono)'}} axisLine={false} tickLine={false} />
+                    <RechartsTooltip 
+                      contentStyle={{ backgroundColor: '#0f172a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                      itemStyle={{ color: '#818cf8', fontFamily: 'var(--font-jetbrains-mono)', fontSize: '10px' }}
+                    />
+                    <Area type="monotone" dataKey="val" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorVal)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="lg:col-span-4 space-y-6">
+                <div className="stealth-card p-6 border-b-[3px] border-b-rose-500/50">
+                  <h3 className="data-label text-rose-500 mb-6">CRITICAL_VECTORS</h3>
+                  <div className="space-y-4">
+                    {Object.entries(initialData.global?.severity_breakdown || {}).sort((a: any, b: any) => b[1] - a[1]).map(([name, count]: [string, any], i) => (
+                      <div key={i} className="flex items-center justify-between">
+                         <div className="flex items-center gap-2">
+                           <div className={cn("w-1.5 h-1.5 rounded-full", name === 'High' ? 'bg-rose-500' : (name === 'Medium' ? 'bg-indigo-500' : 'bg-slate-500'))}></div>
+                           <span className="text-[11px] font-bold text-slate-300 font-sans">{name.toUpperCase()}</span>
+                         </div>
+                         <span className="font-mono text-[11px] text-slate-100">{count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="stealth-card p-6 bg-indigo-500/10 border-indigo-500/20">
+                   <h3 className="data-label text-indigo-400 mb-2 font-black">STABILITY_ANNOUNCEMENT</h3>
+                   <p className="text-[11px] font-mono text-slate-400 leading-relaxed">
+                     Automated assessment identifies a 12.4% increase in systemic volatility. Global regression models indicate convergence on 4 potential Hotspot nodes.
+                   </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case 7:
+        return (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="stealth-card p-6 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-900/10">
+               <div className="flex-1 w-full relative">
+                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                 <input 
+                  type="text" 
+                  placeholder="SEARCH_INTELLIGENCE_LEDGER..."
+                  className="w-full bg-black/40 border border-white/5 rounded-lg pl-12 pr-4 py-3 text-sm font-mono text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/40 transition-colors"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                 />
+               </div>
+               <div className="flex gap-2">
+                 <div className="flex items-center gap-2 px-4 py-2 bg-slate-900/40 border border-white/5 rounded-lg">
+                   <Filter className="w-3 h-3 text-slate-500" />
+                   <span className="text-[10px] font-mono text-slate-400">{filteredLedger.length} RESULTS</span>
+                 </div>
+               </div>
+            </div>
+
+            <div className="stealth-card overflow-hidden">
+               <div className="overflow-x-auto">
+                 <table className="w-full border-collapse">
+                   <thead>
+                     <tr className="bg-slate-900/30 border-b border-white/5">
+                        <th className="px-6 py-4 text-left data-label">CRIME_IDENTITY</th>
+                        <th className="px-6 py-4 text-center data-label">TOTAL</th>
+                        <th className="px-6 py-4 text-center data-label">SLOPE</th>
+                        <th className="px-6 py-4 text-center data-label">RISK_SCORE</th>
+                        <th className="px-6 py-4 text-center data-label">LEVEL</th>
+                        <th className="px-6 py-4 text-right data-label">ACTION</th>
+                     </tr>
+                   </thead>
+                   <tbody className="divide-y divide-white/5">
+                     {filteredLedger.slice(0, 50).map((row: any, i: number) => (
+                       <tr key={i} className="hover:bg-white/[0.02] transition-colors group">
+                         <td className="px-6 py-4">
+                           <div className="flex flex-col">
+                             <span className="text-[11px] font-sans font-bold text-slate-100 uppercase tracking-tight group-hover:text-indigo-400 transition-colors">{row.KEY}</span>
+                             <span className="text-[9px] font-mono text-slate-600">ID: {Math.random().toString(36).substring(7).toUpperCase()}</span>
+                           </div>
+                         </td>
+                         <td className="px-6 py-4 text-center">
+                            <span className="font-mono text-[11px] text-slate-400">{row.Total_Count || row.TOTAL_COUNT}</span>
+                         </td>
+                         <td className="px-6 py-4 text-center">
+                            <span className={cn("font-mono text-[11px]", (row.Slope || row.Trend_Slope) > 0 ? "text-rose-500" : "text-emerald-500")}>{(row.Slope || row.Trend_Slope)?.toFixed(3)}</span>
+                         </td>
+                         <td className="px-6 py-4 text-center">
+                            <span className="font-mono text-[11px] text-indigo-400">{(row.Risk_Score)?.toFixed(4)}</span>
+                         </td>
+                         <td className="px-6 py-4 text-center">
+                            <div className={cn(
+                              "inline-flex px-2 py-0.5 rounded-full text-[9px] font-mono font-bold tracking-widest uppercase",
+                              row.Risk_Level === 'High' ? "bg-rose-500/10 text-rose-500" : (row.Risk_Level === 'Medium' ? "bg-indigo-500/10 text-indigo-500" : "bg-slate-500/10 text-slate-500")
+                            )}>
+                              {row.Risk_Level}
+                            </div>
+                         </td>
+                         <td className="px-6 py-4 text-right">
+                           <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                              <Eye className="w-3 h-3 text-slate-600 group-hover:text-indigo-400" />
+                           </button>
+                         </td>
+                       </tr>
+                     ))}
+                   </tbody>
+                 </table>
+               </div>
+               {filteredLedger.length > 50 && (
+                 <div className="p-4 bg-slate-900/10 border-t border-white/5 text-center text-[10px] font-mono text-slate-600">
+                    Showing top 50 intelligence nodes. Refine search for accurate targeting.
+                 </div>
+               )}
+            </div>
+          </div>
+        );
       case 2:
         return (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -334,23 +499,45 @@ export default function Dashboard({ initialData }: PythonDataProps) {
       </nav>
 
       {/* CORE CONTENT REGION */}
-      <div className="flex-1 min-w-0 w-full space-y-8">
-        <header className="flex justify-between items-end pb-4">
+      <div className="flex-1 min-w-0 w-full space-y-8 pb-16">
+        <header className="flex justify-between items-end pb-4 border-b border-white/5">
            <div>
-             <span className="data-label">VIEWPORT_ACTIVE</span>
+             <span className="data-label text-indigo-400">COMMAND_NODE_ACTIVE</span>
              <h2 className="text-3xl font-sans font-black text-slate-100 tracking-tighter mt-1">
                {tabs.find(t => t.id === activeTab)?.name.toUpperCase()}
              </h2>
            </div>
-           <div className="hidden md:flex gap-4 items-center">
-             <div className="h-1 w-24 bg-slate-900 overflow-hidden rounded-full">
-               <div className="bg-indigo-500/30 h-full w-[45%]"></div>
+           <div className="hidden md:flex gap-6 items-center">
+             <div className="flex flex-col items-end">
+                <span className="data-label uppercase">System_Load</span>
+                <span className="text-[10px] font-mono text-emerald-500 font-bold">NOMINAL_0.22ms</span>
              </div>
-             <span className="data-label">CACHE_UTIL: 45%</span>
+             <div className="h-8 w-[1px] bg-white/10"></div>
+             <div className="flex flex-col items-end">
+                <span className="data-label uppercase">Data_Silo</span>
+                <span className="text-[10px] font-mono text-indigo-400 font-bold">REDUNDANCY_ACTIVE</span>
+             </div>
            </div>
         </header>
 
         {renderTabContent()}
+      </div>
+
+      {/* INTELLIGENCE MARQUEE - TICKER */}
+      <div className="fixed bottom-0 left-0 right-0 h-10 bg-black/80 backdrop-blur-xl border-t border-indigo-500/30 z-50 flex items-center overflow-hidden">
+        <div className="bg-indigo-500 h-full px-4 flex items-center justify-center shrink-0 z-10 shadow-[4px_0_15px_rgba(99,102,241,0.5)]">
+           <span className="text-[10px] font-mono font-black text-black tracking-widest uppercase">Live_Threats</span>
+        </div>
+        <div className="flex whitespace-nowrap animate-marquee">
+          {[...initialData.ledger.filter((i: any) => i.Risk_Level === 'High').slice(0, 10), ...initialData.ledger.filter((i: any) => i.Risk_Level === 'High').slice(0, 10)].map((alert: any, i: number) => (
+            <div key={i} className="flex items-center gap-4 px-8 border-r border-white/5">
+               <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
+               <span className="text-[10px] font-mono font-bold text-rose-500 uppercase tracking-wider">{alert.KEY}</span>
+               <span className="text-[9px] font-mono text-slate-500">RISK: {(alert.Risk_Score * 100).toFixed(1)}%</span>
+               <span className="text-[9px] font-mono text-indigo-400">TREND: +{alert.Slope?.toFixed(2)}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
     </div>
