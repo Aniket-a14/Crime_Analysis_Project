@@ -32,6 +32,7 @@ dashboard/out/
 
 # Data and large files
 *.csv
+!dashboard/*.csv
 !dashboard/public/outputs/*.json
 !dashboard/public/outputs/*.png
 *.pdf

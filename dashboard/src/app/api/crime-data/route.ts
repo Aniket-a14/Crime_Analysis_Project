@@ -7,9 +7,8 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const parentDir = path.join(process.cwd(), '..');
-    const riskScoresPath = path.join(parentDir, 'public_safety_risk_scores.csv');
-    const trendsPath = path.join(parentDir, 'rising_crime_trends.csv');
+    const riskScoresPath = path.join(process.cwd(), 'public_safety_risk_scores.csv');
+    const trendsPath = path.join(process.cwd(), 'rising_crime_trends.csv');
 
     const riskScoresCsv = await fs.readFile(riskScoresPath, 'utf-8');
     const trendsCsv = await fs.readFile(trendsPath, 'utf-8');
