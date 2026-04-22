@@ -4,6 +4,8 @@ import data03 from '../../public/outputs/data_03.json';
 import data04 from '../../public/outputs/data_04.json';
 import data05 from '../../public/outputs/data_05.json';
 import data06 from '../../public/outputs/data_06.json';
+import csvRisk from '../../public/outputs/csv_risk.json';
+import csvTrends from '../../public/outputs/csv_trends.json';
 
 export async function getPythonOutputs() {
   try {
@@ -13,7 +15,9 @@ export async function getPythonOutputs() {
       severity: data03,
       hotspots: data04,
       forecasts: data05,
-      riskMatrix: data06
+      riskMatrix: data06,
+      csvRisk,
+      csvTrends
     };
   } catch (error) {
     console.error('Error bundling python outputs:', error);
