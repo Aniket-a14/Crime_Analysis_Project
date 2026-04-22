@@ -1,4 +1,7 @@
 // Static imports for 100% reliability on Vercel
+import data02 from '../../public/outputs/data_02.json';
+import data03 from '../../public/outputs/data_03.json';
+import data04 from '../../public/outputs/data_04.json';
 import data05 from '../../public/outputs/data_05.json';
 import data06 from '../../public/outputs/data_06.json';
 import data01 from '../../public/outputs/data_01.json';
