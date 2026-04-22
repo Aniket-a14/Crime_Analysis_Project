@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn(inter.variable, jetbrainsMono.variable, "dark")}>
+    <html lang="en" className={cn(inter.variable, jetbrainsMono.variable, "dark")} suppressHydrationWarning>
       <body className="min-h-screen bg-slate-950 font-sans antialiased overflow-x-hidden">
         {/* Intelligence Layers */}
         <div className="fixed inset-0 dot-grid opacity-100 pointer-events-none z-0"></div>
