@@ -1,5 +1,9 @@
 # Crime Analysis & Prediction Project
 
+<p align="center">
+  <img src="assets/crime-analysis.png" alt="Crime Analysis & Prediction Dashboard" width="100%" />
+</p>
+
 ## Overview
 This project performs a comprehensive analysis of monthly crime datasets (January to September 2025) to identify trends, classify crime severity, predict hotspots, forecast future crime loads, and assess public safety risks. The goal is to provide actionable insights for law enforcement and public safety planning.
 
